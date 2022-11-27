@@ -30,32 +30,38 @@ function drawDeals(cl) {
   $('div.all').first().append(`<table id="${cl}" class="table">
   <thead>
     <tr>
-      <th>id</th>
+      <th>symbol</th>
+      <th>volume</th>
       <th>type</th>
-      <th>entry</th>
-      <th>created_at</th>
-      <th>price</th>
+      <th>sl</th>
+      <th>tp</th>
+      <th>time_open</th>
+      <th>time_close</th>
+      <th>price_open</th>
+      <th>price_close</th>
       <th>comment</th>
-      <th>stop_loss</th>
       <th>profit</th>
     </tr>
   </thead>
   <tbody>
-  ${data.deals.map(deal => `
+  ${data.positions.map(pos => `
     <tr>
-      <td>${deal.id}</td>
-      <td>${deal.type}</td>
-      <td>${deal.entry}</td>
-      <td>${new Date(deal.time_create).toISOString()}</td>
-      <td>${deal.price}</td>
-      <td>${deal.comment}</td>
-      <td>${deal.sl}</td>
-      <td>${deal.profit}</td>
+      <td>${pos.symbol || ''}</td>
+      <td>${pos.volume || ''}</td>
+      <td>${pos.type}</td>
+      <td>${pos.sl || ''}</td>
+      <td>${pos.tp || ''}</td>
+      <td>${pos.time_open ? new Date(pos.time_open).toISOString() : ''}</td>
+      <td>${pos.time_close ? new Date(pos.time_close).toISOString() : ''}</td>
+      <td>${pos.price_open || ''}</td>
+      <td>${pos.price_close || ''}</td>
+      <td>${pos.comment || ''}</td>
+      <td>${pos.profit}</td>
     </tr>
   `).join('')} 
   </tbody>
   </table>`);
-  $(`#${cl}`).DataTable({ pageLength: 30 });
+  $(`#${cl}`).DataTable({ pageLength: 30, order: [[ 5, 'asc' ]] });
 }
 
 function setInfo(obj) {
