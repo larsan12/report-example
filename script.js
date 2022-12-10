@@ -8,6 +8,9 @@ am5.ready(function() {
   setTitle('Прибыль робота');
   drawDealsChart('prof_com');
 
+  setTitle('Статистика по итерациям');
+  drawIterations('iters');
+
   setTitle('Сделки');
   drawDeals('deals_table');
 
@@ -17,6 +20,58 @@ am5.ready(function() {
   setTitle('Параметры оптимизации');
   setInfo(data.parameters);
 })
+
+function drawIterations(cl) {
+  function getTableLine(line, col = true) {
+    return `
+      <tr>
+       <td class="${col ? "blue" : ""}">${line.i ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.date_from ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.date_to ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.drawdown ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.profit_factor ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.recovery_factor ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.sharpe ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.expected_payoff ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.profit_trades ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.trades ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.profit ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.['profit %/year'] ?? ''}</td>
+        <td class="${col ? "green" : ""}">${line.out_sample?.trades ?? ''}</td>
+        <td class="${col ? "green" : ""}">${line.out_sample?.profit ?? ''}</td>
+        <td class="${col ? "green" : ""}">${line.out_sample?.['profit %/year'] ?? ''}</td>
+        <td class="${col ? "green" : ""}">${line.efficiency ?? ''}</td>
+      </tr>
+    `
+  }
+  $('div.all').first().append(`<table class="iters_table" id="${cl}" class="table">
+  <thead>
+    <tr>
+      <th>i</th>
+      <th>date from</th>
+      <th>date to</th>
+      <th>drawdown</th>
+      <th>profit factor</th>
+      <th>recovery_factor</th>
+      <th>sharpe</th>
+      <th>expected payoff</th>
+      <th>profit trades</th>
+      <th>trades</th>
+      <th>profit</th>
+      <th>profit %/year</th>
+      <th>trades</th>
+      <th>profit</th>
+      <th>profit %/year</th>
+      <th>efficiency</th>
+    </tr>
+  </thead>
+  <tbody>
+  ${data.iterations.map((line) => getTableLine(line, true)).join('')}
+  ${getTableLine({ in_sample: {drawdown: 'average:' }}, false)}
+  ${getTableLine(data.iterations_average, false)}
+  </tbody>
+  </table>`);
+}
 
 function setTitle(title) {
   $('div.all').first().append(
@@ -46,16 +101,16 @@ function drawDeals(cl) {
   <tbody>
   ${data.positions.map(pos => `
     <tr>
-      <td>${pos.symbol || ''}</td>
-      <td>${pos.volume || ''}</td>
+      <td>${pos.symbol ?? ''}</td>
+      <td>${pos.volume ?? ''}</td>
       <td>${pos.type}</td>
-      <td>${pos.sl || ''}</td>
-      <td>${pos.tp || ''}</td>
+      <td>${pos.sl ?? ''}</td>
+      <td>${pos.tp ?? ''}</td>
       <td>${pos.time_open ? new Date(pos.time_open).toISOString() : ''}</td>
       <td>${pos.time_close ? new Date(pos.time_close).toISOString() : ''}</td>
-      <td>${pos.price_open || ''}</td>
-      <td>${pos.price_close || ''}</td>
-      <td>${pos.comment || ''}</td>
+      <td>${pos.price_open ?? ''}</td>
+      <td>${pos.price_close ?? ''}</td>
+      <td>${pos.comment ?? ''}</td>
       <td>${pos.profit}</td>
     </tr>
   `).join('')} 
