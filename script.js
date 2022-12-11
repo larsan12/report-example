@@ -22,12 +22,12 @@ am5.ready(function() {
 })
 
 function drawIterations(cl) {
-  function getTableLine(line, col = true) {
+  function getTableLine(line, col = true, subtitle) {
     return `
       <tr>
        <td class="${col ? "blue" : ""}">${line.i ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.date_from ?? ''}</td>
-        <td class="${col ? "blue" : ""}">${line.in_sample?.date_to ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.date_to ?? subtitle ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.drawdown ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.profit_factor ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.recovery_factor ?? ''}</td>
@@ -67,10 +67,10 @@ function drawIterations(cl) {
   </thead>
   <tbody>
   ${data.iterations.map((line) => getTableLine(line, true)).join('')}
-  ${getTableLine({ in_sample: {drawdown: 'average:' }}, false)}
-  ${getTableLine(data.iterations_average, false)}
+  ${getTableLine(data.iterations_average, false, 'average')}
   </tbody>
   </table>`);
+  $(`#${cl}`).DataTable({ pageLength: 100, searching: false, order: [[ 0, 'asc' ]] });
 }
 
 function setTitle(title) {
