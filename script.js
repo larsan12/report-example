@@ -26,8 +26,9 @@ function drawIterations(cl) {
     return `
       <tr>
        <td class="${col ? "blue" : ""}">${line.i ?? ''}</td>
-        <td class="${col ? "blue" : ""}">${line.in_sample?.date_from ?? ''}</td>
-        <td class="${col ? "blue" : ""}">${line.in_sample?.date_to ?? subtitle ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.start ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.forward ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.finish ?? subtitle ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.drawdown ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.profit_factor ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.recovery_factor ?? ''}</td>
@@ -41,6 +42,7 @@ function drawIterations(cl) {
         <td class="${col ? "green" : ""}">${line.out_sample?.profit ?? ''}</td>
         <td class="${col ? "green" : ""}">${line.out_sample?.['profit %/year'] ?? ''}</td>
         <td class="${col ? "green" : ""}">${line.efficiency ?? ''}</td>
+        <td class="${col ? "green" : ""}">${line.inputs ?? ''}</td>
       </tr>
     `
   }
@@ -49,7 +51,8 @@ function drawIterations(cl) {
     <tr>
       <th>i</th>
       <th>date from</th>
-      <th>date to</th>
+      <th>forward</th>
+      <th>finish</th>
       <th>drawdown</th>
       <th>profit factor</th>
       <th>recovery_factor</th>
@@ -63,6 +66,7 @@ function drawIterations(cl) {
       <th>profit</th>
       <th>profit %/year</th>
       <th>efficiency</th>
+      <th>inputs</th>
     </tr>
   </thead>
   <tbody>
