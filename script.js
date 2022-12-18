@@ -72,9 +72,43 @@ function drawIterations(cl) {
   <tbody>
   ${data.iterations.map((line) => getTableLine(line, true)).join('')}
   ${getTableLine(data.iterations_average, false, 'average')}
+  ${getTableLine(getCorrelationsRow('pearson'), false, 'pearson corr')}
   </tbody>
   </table>`);
   $(`#${cl}`).DataTable({ pageLength: 100, searching: false, order: [[ 0, 'asc' ]] });
+}
+
+function getCorrelationsRow(type) {
+  function getValue(obj, field) {
+    return field.split('.').reduce((res, curr) => {
+      return res[curr];
+    }, obj)
+  }
+  function getCorrelationRow(field) {
+    return Math.round(spearson.correlation[type](
+      data.iterations.map(v => getValue(v, field)), 
+      data.iterations.map(v => v.out_sample.profit),
+    ) * 1000)/1000;
+  }
+  return {
+    in_sample:{
+      drawdown: getCorrelationRow('in_sample.drawdown'),
+      profit_factor: getCorrelationRow('in_sample.profit_factor'),
+      recovery_factor: getCorrelationRow('in_sample.recovery_factor'),
+      sharpe: getCorrelationRow('in_sample.sharpe'),
+      profit_trades: getCorrelationRow('in_sample.profit_trades'),
+      expected_payoff: getCorrelationRow('in_sample.expected_payoff'),
+      trades: getCorrelationRow('in_sample.trades'),
+      profit: getCorrelationRow('in_sample.profit'),
+      'profit %/year': '-'
+    },
+    out_sample:{
+      trades: getCorrelationRow('out_sample.trades'),
+      profit: '-',
+      'profit %/year': '-'
+    },
+    efficiency: getCorrelationRow('efficiency')
+  };
 }
 
 function setTitle(title) {
