@@ -28,13 +28,16 @@ function drawIterations(cl) {
        <td class="${col ? "blue" : ""}">${line.i ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.start ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.forward ?? ''}</td>
-        <td class="${col ? "blue" : ""}">${line.in_sample?.finish ?? subtitle ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.out_sample?.stop ?? subtitle ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.drawdown ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.profit_factor ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.recovery_factor ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.sharpe ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.expected_payoff ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.profit_trades ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.profit_trades_div ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.conprofit_trades ?? ''}</td>
+        <td class="${col ? "blue" : ""}">${line.in_sample?.conprofitmax ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.trades ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.profit ?? ''}</td>
         <td class="${col ? "blue" : ""}">${line.in_sample?.['profit %/year'] ?? ''}</td>
@@ -52,13 +55,16 @@ function drawIterations(cl) {
       <th>i</th>
       <th>date from</th>
       <th>forward</th>
-      <th>finish</th>
+      <th>stop</th>
       <th>drawdown</th>
       <th>profit factor</th>
-      <th>recovery_factor</th>
+      <th>recovery factor</th>
       <th>sharpe</th>
       <th>expected payoff</th>
       <th>profit trades</th>
+      <th>profit trades div</th>
+      <th>conprofit trades</th>
+      <th>conprofitmax</th>
       <th>trades</th>
       <th>profit</th>
       <th>profit %/year</th>
@@ -72,42 +78,47 @@ function drawIterations(cl) {
   <tbody>
   ${data.iterations.map((line) => getTableLine(line, true)).join('')}
   ${getTableLine(data.iterations_average, false, 'average')}
-  ${getTableLine(getCorrelationsRow('pearson'), false, 'pearson corr')}
+  ${getTableLine(getCorrelationsRow('pearson', 1), false, 'p.corr')}
+  ${getTableLine(getCorrelationsRow('pearson', 2), false, 'p.corr^2')}
+  ${getTableLine(getCorrelationsRow('pearson', 0.5), false, 'p.corr^0.5')}
   </tbody>
   </table>`);
   $(`#${cl}`).DataTable({ pageLength: 100, searching: false, order: [[ 0, 'asc' ]] });
 }
 
-function getCorrelationsRow(type) {
+function getCorrelationsRow(type, power = 1) {
   function getValue(obj, field) {
     return field.split('.').reduce((res, curr) => {
       return res[curr];
     }, obj)
   }
-  function getCorrelationRow(field) {
+  function getCorrelationRow(field, power = 1) {
     return Math.round(spearson.correlation[type](
-      data.iterations.map(v => getValue(v, field)), 
+      data.iterations.map(v => Math.pow(getValue(v, field), power)), 
       data.iterations.map(v => v.out_sample.profit),
     ) * 1000)/1000;
   }
   return {
     in_sample:{
-      drawdown: getCorrelationRow('in_sample.drawdown'),
-      profit_factor: getCorrelationRow('in_sample.profit_factor'),
-      recovery_factor: getCorrelationRow('in_sample.recovery_factor'),
-      sharpe: getCorrelationRow('in_sample.sharpe'),
-      profit_trades: getCorrelationRow('in_sample.profit_trades'),
-      expected_payoff: getCorrelationRow('in_sample.expected_payoff'),
-      trades: getCorrelationRow('in_sample.trades'),
-      profit: getCorrelationRow('in_sample.profit'),
-      'profit %/year': '-'
+      drawdown: getCorrelationRow('in_sample.drawdown', power),
+      profit_factor: getCorrelationRow('in_sample.profit_factor', power),
+      recovery_factor: getCorrelationRow('in_sample.recovery_factor', power),
+      sharpe: getCorrelationRow('in_sample.sharpe', power),
+      profit_trades: getCorrelationRow('in_sample.profit_trades', power),
+      profit_trades_div: getCorrelationRow('in_sample.profit_trades_div', power),
+      conprofit_trades: getCorrelationRow('in_sample.conprofit_trades', power),
+      conprofitmax: getCorrelationRow('in_sample.conprofitmax', power),
+      expected_payoff: getCorrelationRow('in_sample.expected_payoff', power),
+      trades: getCorrelationRow('in_sample.trades', power),
+      profit: getCorrelationRow('in_sample.profit', power),
+      'profit %/year': getCorrelationRow('in_sample.profit %/year', power),
     },
     out_sample:{
-      trades: getCorrelationRow('out_sample.trades'),
+      trades: getCorrelationRow('out_sample.trades', power),
       profit: '-',
       'profit %/year': '-'
     },
-    efficiency: getCorrelationRow('efficiency')
+    efficiency: getCorrelationRow('efficiency', power)
   };
 }
 
